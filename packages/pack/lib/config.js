@@ -11,32 +11,20 @@ const readJSON = (file) => {
     }
 };
 
-const getGitBranch = () => {
-    try {
-        const { stdout = '' } = execa.sync('git describe --all', { shell: true });
-        return stdout.trim();
-    } catch (e) {
-        return '';
-    }
-};
+const getGitBranch = () => runGitCommand('git describe --all');
 
-const getGitCommitHash = () => {
-    try {
-        const { stdout = '' } = execa.sync('git rev-parse HEAD', { shell: true });
-        return stdout.trim();
-    } catch (e) {
-        return '';
-    }
-};
+const getGitCommitHash = () => runGitCommand('git rev-parse HEAD');
 
-const getGitTagVersion = (applicationName) => {
+const getGitTagVersion = (applicationName) => runGitCommand(`git describe --abbrev=0 --match=${applicationName}*`);
+
+const runGitCommand = (command) => {
     try {
-        const { stdout = '' } = execa.sync(`git describe --abbrev=0 --match=${applicationName}*`, { shell: true });
+        const { stdout = '' } = execa.sync(command, { shell: true });
         return stdout.trim();
-    } catch (e) {
+    } catch {
         return '';
     }
-};
+}
 
 /**
  * Clean ex. proton-mail@4.x.x to 4.x.x
